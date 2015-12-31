@@ -44,6 +44,7 @@ var (
 		"hopeful",
 		"hungry",
 		"insane",
+		"inspiring",
 		"jolly",
 		"jovial",
 		"kickass",
@@ -351,6 +352,9 @@ var (
 		// Samuel Morse - contributed to the invention of a single-wire telegraph system based on European telegraphs and was a co-developer of the Morse code - https://en.wikipedia.org/wiki/Samuel_Morse
 		"morse",
 
+		// Ian Murdock was a German-born American software engineer, known for being the founder of the Debian GNU/Linux distribution project- https://en.wikipedia.org/wiki/Ian_Murdock
+		"murdock",
+
 		// Isaac Newton invented classic mechanics and modern optics. https://en.wikipedia.org/wiki/Isaac_Newton
 		"newton",
 
@@ -398,6 +402,9 @@ var (
 
 		// Srinivasa Ramanujan - Indian mathematician and autodidact who made extraordinary contributions to mathematical analysis, number theory, infinite series, and continued fractions. - https://en.wikipedia.org/wiki/Srinivasa_Ramanujan
 		"ramanujan",
+
+		// Joyce K. Reynolds was an American computer scientist who has been active in the development of the protocols underlying the Internet. She has (co-)authored many RFCs, most notably the Telnet, FTP, and POP protocols. https://en.wikipedia.org/wiki/Joyce_K._Reynolds
+		"reynolds",
 
 		// Sally Kristen Ride was an American physicist and astronaut. She was the first American woman in space, and the youngest American astronaut. https://en.wikipedia.org/wiki/Sally_Ride
 		"ride",
