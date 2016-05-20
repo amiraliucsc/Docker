@@ -321,7 +321,11 @@ func (cli *DaemonCli) reloadConfig() {
 	}
 
 	if err := daemon.ReloadConfiguration(*cli.configFile, flag.CommandLine, reload); err != nil {
-		logrus.Error(err)
+		if os.IsNotExist(err) {
+			logrus.Info(err)
+		} else {
+			logrus.Error(err)
+		}
 	}
 }
 
