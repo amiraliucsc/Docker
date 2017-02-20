@@ -20,8 +20,14 @@ func DefaultDaemonNetworkMode() container.NetworkMode {
 // IsPreDefinedNetwork indicates if a network is predefined by the daemon
 func IsPreDefinedNetwork(network string) bool {
 	n := container.NetworkMode(network)
-	return n.IsBridge() || n.IsHost() || n.IsNone() || n.IsDefault() || network == "ingress"
+	return n.IsBridge() || n.IsHost() || n.IsNone() || n.IsDefault() || network == "ingress" || network == "docker_gwbridge"
 }
+
+// IsPreDefinedNetwork indicates if a network is predefined by the daemon
+//func IsPreDefinedNetwork(network string) bool {
+//	return !container.NetworkMode(network).IsUserDefined()
+//}
+
 
 // ValidateNetMode ensures that the various combinations of requested
 // network settings are valid.

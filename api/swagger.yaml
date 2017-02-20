@@ -1880,6 +1880,7 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
+          SecretReference:
       Resources:
         description: "Resource requirements which apply to each individual container created as part of the service."
         type: "object"
