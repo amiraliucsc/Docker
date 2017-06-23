@@ -34,7 +34,7 @@ export DOCKER_CLIENT_GOOS="${DOCKER_CLIENT_OSARCH%/*}"
 export DOCKER_CLIENT_GOARCH="${DOCKER_CLIENT_OSARCH##*/}"
 DOCKER_CLIENT_GOARCH=${DOCKER_CLIENT_GOARCH:=amd64}
 
-# Retrieve the architecture used in contrib/builder/(deb|rpm)/$PACKAGE_ARCH/
+# Retrieve the architecture
 PACKAGE_ARCH='amd64'
 case "${DOCKER_ENGINE_GOARCH:-$DOCKER_CLIENT_GOARCH}" in
 	arm)
