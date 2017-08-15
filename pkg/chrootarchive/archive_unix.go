@@ -11,7 +11,9 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
+	"strings"
 
+	"github.com/docker/docker/errdefs"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/reexec"
 )
@@ -82,7 +84,11 @@ func invokeUnpack(decompressedArchive io.Reader, dest string, options *archive.T
 		// pending on write pipe forever
 		io.Copy(ioutil.Discard, decompressedArchive)
 
-		return fmt.Errorf("Error processing tar file(%v): %s", err, output)
+		rerr := fmt.Errorf("Error processing tar file(%v): %s", err, output)
+		if strings.Contains(err.Error(), "operation not permitted") {
+			return rerr
+		}
+		return errdefs.InvalidParameter(rerr)
 	}
 	return nil
 }
