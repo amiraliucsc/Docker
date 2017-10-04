@@ -29,10 +29,10 @@ func (s *DockerSwarmSuite) TestServiceUpdatePort(c *check.C) {
 	// Inspect the service and verify port mapping
 	expected := []swarm.PortConfig{
 		{
-			Protocol:      "tcp",
+			Protocol:      swarm.PortConfigProtocolUDP,
 			PublishedPort: 8082,
 			TargetPort:    8083,
-			PublishMode:   "ingress",
+			PublishMode:   swarm.PortConfigPublishModeIngress,
 		},
 	}
 
