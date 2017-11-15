@@ -170,6 +170,7 @@ type Info struct {
 	MemTotal           int64
 	GenericResources   []swarm.GenericResource
 	DockerRootDir      string
+	DNSDefaults        DNSInfo
 	HTTPProxy          string `json:"HttpProxy"`
 	HTTPSProxy         string `json:"HttpsProxy"`
 	NoProxy            string
@@ -192,6 +193,16 @@ type Info struct {
 	RuncCommit         Commit
 	InitCommit         Commit
 	SecurityOptions    []string
+}
+
+// DNSInfo contains the default DNS configuration to use for containers.
+// These values can be overridden per container.
+// TODO use a "ContainerDefaults" wrapper for this instead, and deprecate top-level defaults????
+type DNSInfo struct {
+	// List of IP-addresses for DNS servers
+	DNSServers []string
+	DNSOptions []string
+	DNSSearch  []string
 }
 
 // KeyValue holds a key/value pair

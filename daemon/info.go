@@ -130,6 +130,11 @@ func (daemon *Daemon) SystemInfo() (*types.Info, error) {
 		ServerVersion:      dockerversion.Version,
 		ClusterStore:       daemon.configStore.ClusterStore,
 		ClusterAdvertise:   daemon.configStore.ClusterAdvertise,
+		DNSDefaults: types.DNSInfo{
+			DNSServers: daemon.configStore.DNS,
+			DNSOptions: daemon.configStore.DNSOptions,
+			DNSSearch:  daemon.configStore.DNSSearch,
+		},
 		HTTPProxy:          sockets.GetProxyEnv("http_proxy"),
 		HTTPSProxy:         sockets.GetProxyEnv("https_proxy"),
 		NoProxy:            sockets.GetProxyEnv("no_proxy"),
