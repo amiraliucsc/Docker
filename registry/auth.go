@@ -158,6 +158,21 @@ func loginV2(authConfig *types.AuthConfig, endpoint APIEndpoint, userAgent strin
 	}
 	defer resp.Body.Close()
 
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return "Login Succeeded", credentialAuthConfig.IdentityToken, nil
+	case http.StatusUnauthorized:
+		return "", "", unauthorizedError{errors.New("Wrong login/password, please try again")}
+	case http.StatusForbidden:
+		// *TODO: Use registry configuration to determine what this says, if anything?
+		return "", "", notActivatedError{errors.Errorf("Login: Account is not active. Please see the documentation of the registry %s for instructions how to activate it.", serverAddress)}
+	case http.StatusInternalServerError:
+		logrus.Errorf("%s returned status code %d. Response Body :\n%s", req.URL.String(), resp.StatusCode, body)
+		return "", "", systemError{errors.New("Internal Server Error")}
+	}
+	return "", "", systemError{errors.Errorf("Login: %s (Code: %d; Headers: %s)", body,
+		resp.StatusCode, resp.Header)}
+
 	if resp.StatusCode == http.StatusOK {
 		return "Login Succeeded", credentialAuthConfig.IdentityToken, nil
 	}
