@@ -144,6 +144,7 @@ func (cli *DaemonCli) start(opts *daemonOptions) (err error) {
 			CertFile:           cli.Config.CommonTLSOptions.CertFile,
 			KeyFile:            cli.Config.CommonTLSOptions.KeyFile,
 			ExclusiveRootPools: true,
+			MinVersion:         tls.VersionTLS12,
 		}
 
 		if cli.Config.TLSVerify {

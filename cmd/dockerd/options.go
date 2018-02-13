@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -63,9 +64,10 @@ func (o *daemonOptions) InstallFlags(flags *pflag.FlagSet) {
 	// TODO use flag flags.String("identity"}, "i", "", "Path to libtrust key file")
 
 	o.TLSOptions = &tlsconfig.Options{
-		CAFile:   filepath.Join(dockerCertPath, DefaultCaFile),
-		CertFile: filepath.Join(dockerCertPath, DefaultCertFile),
-		KeyFile:  filepath.Join(dockerCertPath, DefaultKeyFile),
+		CAFile:     filepath.Join(dockerCertPath, DefaultCaFile),
+		CertFile:   filepath.Join(dockerCertPath, DefaultCertFile),
+		KeyFile:    filepath.Join(dockerCertPath, DefaultKeyFile),
+		MinVersion: tls.VersionTLS12,
 	}
 	tlsOptions := o.TLSOptions
 	flags.Var(opts.NewQuotedString(&tlsOptions.CAFile), "tlscacert", "Trust certs signed only by this CA")

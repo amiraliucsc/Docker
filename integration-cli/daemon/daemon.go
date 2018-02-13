@@ -2,6 +2,7 @@ package daemon // import "github.com/docker/docker/integration-cli/daemon"
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -159,9 +160,10 @@ func (d *Daemon) getClientConfig() (*clientConfig, error) {
 	)
 	if d.UseDefaultTLSHost {
 		option := &tlsconfig.Options{
-			CAFile:   "fixtures/https/ca.pem",
-			CertFile: "fixtures/https/client-cert.pem",
-			KeyFile:  "fixtures/https/client-key.pem",
+			CAFile:     "fixtures/https/ca.pem",
+			CertFile:   "fixtures/https/client-cert.pem",
+			KeyFile:    "fixtures/https/client-key.pem",
+			MinVersion: tls.VersionTLS12,
 		}
 		tlsConfig, err := tlsconfig.Client(*option)
 		if err != nil {

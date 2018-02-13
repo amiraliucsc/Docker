@@ -1,6 +1,7 @@
 package kv // import "github.com/docker/docker/pkg/discovery/kv"
 
 import (
+	"crypto/tls"
 	"fmt"
 	"path"
 	"strings"
@@ -75,9 +76,10 @@ func (s *Discovery) Initialize(uris string, heartbeat time.Duration, ttl time.Du
 	if clusterOpts["kv.cacertfile"] != "" && clusterOpts["kv.certfile"] != "" && clusterOpts["kv.keyfile"] != "" {
 		logrus.Info("Initializing discovery with TLS")
 		tlsConfig, err := tlsconfig.Client(tlsconfig.Options{
-			CAFile:   clusterOpts["kv.cacertfile"],
-			CertFile: clusterOpts["kv.certfile"],
-			KeyFile:  clusterOpts["kv.keyfile"],
+			CAFile:     clusterOpts["kv.cacertfile"],
+			CertFile:   clusterOpts["kv.certfile"],
+			KeyFile:    clusterOpts["kv.keyfile"],
+			MinVersion: tls.VersionTLS12,
 		})
 		if err != nil {
 			return err

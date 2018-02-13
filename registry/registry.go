@@ -27,8 +27,9 @@ var (
 
 func newTLSConfig(hostname string, isSecure bool) (*tls.Config, error) {
 	// PreferredServerCipherSuites should have no effect
-	tlsConfig := tlsconfig.ServerDefault()
-
+	tlsConfig := tlsconfig.ServerDefault(func(c *tls.Config) {
+		c.MinVersion = tls.VersionTLS12
+	})
 	tlsConfig.InsecureSkipVerify = !isSecure
 
 	if isSecure && CertsDir != "" {
@@ -165,7 +166,9 @@ func addRequiredHeadersToRedirectedRequests(req *http.Request, via []*http.Reque
 // default TLS configuration.
 func NewTransport(tlsConfig *tls.Config) *http.Transport {
 	if tlsConfig == nil {
-		tlsConfig = tlsconfig.ServerDefault()
+		tlsConfig = tlsconfig.ServerDefault(func(c *tls.Config) {
+			c.MinVersion = tls.VersionTLS12
+		})
 	}
 
 	direct := &net.Dialer{

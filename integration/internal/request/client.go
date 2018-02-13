@@ -1,6 +1,7 @@
 package request // import "github.com/docker/docker/integration/internal/request"
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -32,6 +33,7 @@ func NewTLSAPIClient(t *testing.T, host, cacertPath, certPath, keyPath string) (
 		CertFile:           certPath,
 		KeyFile:            keyPath,
 		ExclusiveRootPools: true,
+		MinVersion:         tls.VersionTLS12,
 	}
 	config, err := tlsconfig.Client(opts)
 	require.Nil(t, err)

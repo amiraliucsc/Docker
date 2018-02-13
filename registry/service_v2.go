@@ -1,6 +1,7 @@
 package registry // import "github.com/docker/docker/registry"
 
 import (
+	"crypto/tls"
 	"net/url"
 	"strings"
 
@@ -8,7 +9,9 @@ import (
 )
 
 func (s *DefaultService) lookupV2Endpoints(hostname string) (endpoints []APIEndpoint, err error) {
-	tlsConfig := tlsconfig.ServerDefault()
+	tlsConfig := tlsconfig.ServerDefault(func(c *tls.Config) {
+		c.MinVersion = tls.VersionTLS12
+	})
 	if hostname == DefaultNamespace || hostname == IndexHostname {
 		// v2 mirrors
 		for _, mirror := range s.config.Mirrors {

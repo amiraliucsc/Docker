@@ -42,6 +42,7 @@ For example, to list running containers (the equivalent of "docker ps"):
 package client // import "github.com/docker/docker/client"
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net/http"
@@ -121,6 +122,7 @@ func FromEnv(c *Client) error {
 			CertFile:           filepath.Join(dockerCertPath, "cert.pem"),
 			KeyFile:            filepath.Join(dockerCertPath, "key.pem"),
 			InsecureSkipVerify: os.Getenv("DOCKER_TLS_VERIFY") == "",
+			MinVersion:         tls.VersionTLS12,
 		}
 		tlsc, err := tlsconfig.Client(options)
 		if err != nil {
