@@ -224,6 +224,7 @@ func TestValidateReservedNamespaceLabels(t *testing.T) {
 
 func TestValidateConfigurationErrors(t *testing.T) {
 	minusNumber := -10
+	zero := 0
 	testCases := []struct {
 		config *Config
 	}{
@@ -313,7 +314,7 @@ func TestValidateConfigurationErrors(t *testing.T) {
 		{
 			config: &Config{
 				CommonConfig: CommonConfig{
-					MaxDownloadAttempts: 0,
+					MaxDownloadAttempts: &zero,
 					// This is weird...
 					ValuesSet: map[string]interface{}{
 						"max-download-attempts": -1,
