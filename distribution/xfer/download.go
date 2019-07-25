@@ -52,10 +52,10 @@ func NewLayerDownloadManager(layerStores map[string]layer.Store, concurrencyLimi
 // WithMaxDownloadAttempts configures the maximum number of download
 // attempts for a download manager.
 func WithMaxDownloadAttempts(max int) func(*LayerDownloadManager) {
-		return func(dlm *LayerDownloadManager) {
-			dlm.maxDownloadAttempts = max
-		}
+	return func(dlm *LayerDownloadManager) {
+		dlm.maxDownloadAttempts = max
 	}
+}
 
 type downloadTransfer struct {
 	Transfer

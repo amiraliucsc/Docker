@@ -573,7 +573,7 @@ func Validate(config *Config) error {
 		return fmt.Errorf("invalid max concurrent uploads: %d", *config.MaxConcurrentUploads)
 	}
 	// validate MaxDownloadAttempts
-	if config.MaxDownloadAttempts != nil && *config.MaxDownloadAttempts < 0 {
+	if config.MaxDownloadAttempts != nil && *config.MaxDownloadAttempts <= 0 {
 		return fmt.Errorf("invalid max download attempts: %d", *config.MaxDownloadAttempts)
 	}
 

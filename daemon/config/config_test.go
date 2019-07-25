@@ -313,6 +313,17 @@ func TestValidateConfigurationErrors(t *testing.T) {
 		{
 			config: &Config{
 				CommonConfig: CommonConfig{
+					MaxDownloadAttempts: &0,
+					// This is weird...
+					ValuesSet: map[string]interface{}{
+						"max-download-attempts": -1,
+					},
+				},
+			},
+		},
+		{
+			config: &Config{
+				CommonConfig: CommonConfig{
 					NodeGenericResources: []string{"foo"},
 				},
 			},
