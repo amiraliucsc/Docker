@@ -18,6 +18,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const maxDownloadAttempts = 5
+
 // LayerDownloadManager figures out which layers need to be downloaded, then
 // registers and downloads those, taking into account dependencies between
 // layers.
@@ -34,18 +36,26 @@ func (ldm *LayerDownloadManager) SetConcurrency(concurrency int) {
 }
 
 // NewLayerDownloadManager returns a new LayerDownloadManager.
-func NewLayerDownloadManager(layerStores map[string]layer.Store, concurrencyLimit int, downloadattempts int, options ...func(*LayerDownloadManager)) *LayerDownloadManager {
+func NewLayerDownloadManager(layerStores map[string]layer.Store, concurrencyLimit int, options ...func(*LayerDownloadManager)) *LayerDownloadManager {
 	manager := LayerDownloadManager{
 		layerStores:         layerStores,
 		tm:                  NewTransferManager(concurrencyLimit),
 		waitDuration:        time.Second,
-		maxDownloadAttempts: downloadattempts,
+		maxDownloadAttempts: maxDownloadAttempts,
 	}
 	for _, option := range options {
 		option(&manager)
 	}
 	return &manager
 }
+
+// WithMaxDownloadAttempts configures the maximum number of download
+// attempts for a download manager.
+func WithMaxDownloadAttempts(max int) func(*LayerDownloadManager) {
+		return func(dlm *LayerDownloadManager) {
+			dlm.maxDownloadAttempts = max
+		}
+	}
 
 type downloadTransfer struct {
 	Transfer
@@ -283,7 +293,7 @@ func (ldm *LayerDownloadManager) makeDownloadFunc(descriptor DownloadDescriptor,
 				}
 
 				retries++
-				if _, isDNR := err.(DoNotRetry); isDNR || retries == ldm.maxDownloadAttempts {
+				if _, isDNR := err.(DoNotRetry); isDNR || retries >= ldm.maxDownloadAttempts {
 					logrus.Errorf("Download failed: %v", err)
 					d.err = err
 					return
