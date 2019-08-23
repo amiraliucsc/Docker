@@ -401,7 +401,7 @@ func TestMaxDownloadAttempts(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		t.Run(string(tc.maxDownloadAttempts), func(t *testing.T) {
+		t.Run(string(tc.id), func(t *testing.T) {
 			t.Parallel()
 			layerStore := &mockLayerStore{make(map[layer.ChainID]*mockLayer)}
 			lsMap := make(map[string]layer.Store)
@@ -426,15 +426,6 @@ func TestMaxDownloadAttempts(t *testing.T) {
 			var currentDownloads int32
 			descriptors := downloadDescriptors(&currentDownloads)
 			descriptors[4].(*mockDownloadDescriptor).simulateRetries = tc.simulateRetries
-		
-			firstDescriptor := descriptors[0].(*mockDownloadDescriptor)
-		
-			// Pre-register the first layer to simulate an already-existing layer
-			l, err := layerStore.Register(firstDescriptor.mockTarStream(), "")
-			if err != nil {
-				t.Fatal(err)
-			}
-			firstDescriptor.diffID = l.DiffID()
 		
 			_, _, err = ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
 			if tc.id <= 3 && err != nil {
