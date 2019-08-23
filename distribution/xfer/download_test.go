@@ -360,3 +360,89 @@ func TestCancelledDownload(t *testing.T) {
 	close(progressChan)
 	<-progressDone
 }
+
+func TestMaxDownloadAttempts(t *testing.T) {
+	tests := []struct {
+		id					int
+		simulateRetries	 	int
+		maxDownloadAttempts	int
+	}{
+		// these should pass
+		{
+			id:						1,
+			simulateRetries:	 	2,
+			maxDownloadAttempts:	5,
+		},
+		{
+			id:						2,
+			simulateRetries:	 	5,
+			maxDownloadAttempts:	7,
+		},
+		{
+			id:						3,
+			simulateRetries:	 	15,
+			maxDownloadAttempts:	1000,
+		},
+		// these should fail
+		{
+			id:						4,
+			simulateRetries:	 	6,
+			maxDownloadAttempts:	5,
+		},
+		{
+			id:						5,
+			simulateRetries:	 	9,
+			maxDownloadAttempts:	0,
+		},
+		{
+			id:						6,
+			simulateRetries:	 	41,
+			maxDownloadAttempts:	20,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(string(tc.maxDownloadAttempts), func(t *testing.T) {
+			t.Parallel()
+			layerStore := &mockLayerStore{make(map[layer.ChainID]*mockLayer)}
+			lsMap := make(map[string]layer.Store)
+			lsMap[runtime.GOOS] = layerStore
+			ldm := NewLayerDownloadManager(
+				lsMap, 
+				maxDownloadConcurrency, 
+				func(m *LayerDownloadManager) { 
+					m.waitDuration = time.Millisecond
+					m.maxDownloadAttempts = tc.maxDownloadAttempts 
+				})
+		
+			progressChan := make(chan progress.Progress)
+			progressDone := make(chan struct{})
+					
+			go func() {
+				for range progressChan {
+				}
+				close(progressDone)
+			}()
+		
+			var currentDownloads int32
+			descriptors := downloadDescriptors(&currentDownloads)
+			descriptors[4].(*mockDownloadDescriptor).simulateRetries = tc.simulateRetries
+		
+			firstDescriptor := descriptors[0].(*mockDownloadDescriptor)
+		
+			// Pre-register the first layer to simulate an already-existing layer
+			l, err := layerStore.Register(firstDescriptor.mockTarStream(), "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			firstDescriptor.diffID = l.DiffID()
+		
+			_, _, err = ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
+			if tc.id <= 3 && err != nil {
+				t.Fatalf("Error while no error was expected: %v", err)
+			}
+			if tc.id > 3 && err == nil {
+				t.Fatalf("No Error while error was expected: %v", err)
+			}
+		})
+	}
+}
