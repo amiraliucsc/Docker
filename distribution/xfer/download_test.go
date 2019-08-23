@@ -427,7 +427,7 @@ func TestMaxDownloadAttempts(t *testing.T) {
 			descriptors := downloadDescriptors(&currentDownloads)
 			descriptors[4].(*mockDownloadDescriptor).simulateRetries = tc.simulateRetries
 		
-			_, _, err = ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
+			_, _, err := ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
 			if tc.id <= 3 && err != nil {
 				t.Fatalf("Error while no error was expected: %v", err)
 			}
