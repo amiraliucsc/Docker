@@ -363,41 +363,41 @@ func TestCancelledDownload(t *testing.T) {
 
 func TestMaxDownloadAttempts(t *testing.T) {
 	tests := []struct {
-		id					int
-		simulateRetries	 	int
-		maxDownloadAttempts	int
+		id                  int
+		simulateRetries     int
+		maxDownloadAttempts int
 	}{
 		// these should pass
 		{
-			id:						1,
-			simulateRetries:	 	2,
-			maxDownloadAttempts:	5,
+			id:                  1,
+			simulateRetries:     2,
+			maxDownloadAttempts: 5,
 		},
 		{
-			id:						2,
-			simulateRetries:	 	5,
-			maxDownloadAttempts:	7,
+			id:                  2,
+			simulateRetries:     5,
+			maxDownloadAttempts: 7,
 		},
 		{
-			id:						3,
-			simulateRetries:	 	15,
-			maxDownloadAttempts:	1000,
+			id:                  3,
+			simulateRetries:     15,
+			maxDownloadAttempts: 1000,
 		},
 		// these should fail
 		{
-			id:						4,
-			simulateRetries:	 	6,
-			maxDownloadAttempts:	5,
+			id:                  4,
+			simulateRetries:     6,
+			maxDownloadAttempts: 5,
 		},
 		{
-			id:						5,
-			simulateRetries:	 	9,
-			maxDownloadAttempts:	0,
+			id:                  5,
+			simulateRetries:     9,
+			maxDownloadAttempts: 0,
 		},
 		{
-			id:						6,
-			simulateRetries:	 	41,
-			maxDownloadAttempts:	20,
+			id:                  6,
+			simulateRetries:     41,
+			maxDownloadAttempts: 20,
 		},
 	}
 	for _, tc := range tests {
@@ -407,26 +407,26 @@ func TestMaxDownloadAttempts(t *testing.T) {
 			lsMap := make(map[string]layer.Store)
 			lsMap[runtime.GOOS] = layerStore
 			ldm := NewLayerDownloadManager(
-				lsMap, 
-				maxDownloadConcurrency, 
-				func(m *LayerDownloadManager) { 
+				lsMap,
+				maxDownloadConcurrency,
+				func(m *LayerDownloadManager) {
 					m.waitDuration = time.Millisecond
-					m.maxDownloadAttempts = tc.maxDownloadAttempts 
+					m.maxDownloadAttempts = tc.maxDownloadAttempts
 				})
-		
+
 			progressChan := make(chan progress.Progress)
 			progressDone := make(chan struct{})
-					
+
 			go func() {
 				for range progressChan {
 				}
 				close(progressDone)
 			}()
-		
+
 			var currentDownloads int32
 			descriptors := downloadDescriptors(&currentDownloads)
 			descriptors[4].(*mockDownloadDescriptor).simulateRetries = tc.simulateRetries
-		
+
 			_, _, err := ldm.Download(context.Background(), *image.NewRootFS(), runtime.GOOS, descriptors, progress.ChanOutput(progressChan))
 			if tc.id <= 3 && err != nil {
 				t.Fatalf("Error while no error was expected: %v", err)
