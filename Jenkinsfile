@@ -17,7 +17,7 @@ pipeline {
         booleanParam(name: 'ppc64le', defaultValue: true, description: 'PowerPC (ppc64le) Build/Test')
         booleanParam(name: 'windowsRS1', defaultValue: false, description: 'Windows 2016 (RS1) Build/Test')
         booleanParam(name: 'windowsRS5', defaultValue: true, description: 'Windows 2019 (RS5) Build/Test')
-        booleanParam(name: 'windows1903', defaultValue: true, description: 'Windows 1903 (SAC) Build/Test')
+        booleanParam(name: 'windows1903', defaultValue: true, description: 'Windows 1903 (SAC) Build/Test (with Hyper-V isolation)')
         booleanParam(name: 'dco', defaultValue: true, description: 'Run the DCO check')
     }
     environment {
@@ -1039,6 +1039,7 @@ pipeline {
                     environment {
                         DOCKER_BUILDKIT        = '0'
                         DOCKER_DUT_DEBUG       = '1'
+                        DOCKER_DUT_HYPERV      = '1'
                         SKIP_VALIDATION_TESTS  = '1'
                         SOURCES_DRIVE          = 'd'
                         SOURCES_SUBDIR         = 'gopath'
