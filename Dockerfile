@@ -287,6 +287,10 @@ VOLUME /var/lib/docker
 # Wrap all commands in the "docker-in-docker" script to allow nested containers
 ENTRYPOINT ["hack/dind"]
 
+FROM base AS vendor
+COPY --from=vndr /build/ /usr/local/bin/
+WORKDIR /go/src/github.com/docker/docker
+
 FROM dev AS final
 # Upload docker source
 COPY . /go/src/github.com/docker/docker

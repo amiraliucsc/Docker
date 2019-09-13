@@ -139,7 +139,15 @@ binary: build ## build the linux binaries
 dynbinary: build ## build the linux dynbinaries
 	$(DOCKER_RUN_DOCKER) hack/make.sh dynbinary
 
-
+ifeq ($(BIND_DIR), .)
+vendor-shell: DOCKER_BUILD_OPTS += --target=vendor
+vendor-shell: build
+vendor-shell:
+	$(DOCKER_RUN_DOCKER) bash
+else
+vendor-shell:
+	$(MAKE) BIND_DIR=. vendor-shell
+endif
 
 cross: DOCKER_CROSS := true
 cross: build ## cross build the binaries for darwin, freebsd and\nwindows
