@@ -294,12 +294,12 @@ func (ldm *LayerDownloadManager) makeDownloadFunc(descriptor DownloadDescriptor,
 
 				retries++
 				if _, isDNR := err.(DoNotRetry); isDNR || retries >= ldm.maxDownloadAttempts {
-					logrus.Errorf("Download failed: %v", err)
+					logrus.Errorf("Download failed after %d attempts: %v", retries, err)
 					d.err = err
 					return
 				}
 
-				logrus.Errorf("Download failed, retrying: %v", err)
+				logrus.Infof("Download failed, retrying (%d/%d): %v", retries, ldm.maxDownloadAttempts, err)
 				delay := retries * 5
 				ticker := time.NewTicker(ldm.waitDuration)
 
