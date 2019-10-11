@@ -3,6 +3,124 @@
 ARG CROSS="false"
 ARG GO_VERSION=1.13.5
 ARG DEBIAN_FRONTEND=noninteractive
+
+#-------------------------------------------------------------------------------
+# Package versions
+#-------------------------------------------------------------------------------
+
+# CRIU_VERSION specifies the version of CRIU to download from the
+# https://github.com/checkpoint-restore/criu repository. CRIU is used
+# in the integration tests to test the experimental checkpoint/restore support
+ARG CRIU_VERSION=v3.12
+
+# REGISTRY_COMMIT specifies the version of the registry to build and install
+# from the https://github.com/docker/distribution repository. This version of
+# the registry is used to test both schema 1 and schema 2 manifests.
+#
+# Generally, the commit specified here should match a current, tagged release.
+#
+# v2.3.0-rc.0
+ARG REGISTRY_COMMIT=47a064d4195a9b56133891bbb13620c3ac83a827
+
+# REGISTRY_COMMIT_SCHEMA1 specifies the version of the regsitry to build and
+# install from the https://github.com/docker/distribution repository. This is
+# an older (pre v2.3.0) version of the registry that only supports schema1
+# manifests. This version of the registry is not working on arm64, so installation
+# is skipped on that architecture.
+
+# v2.2.0 + ec87e9b6971d831f0eff752ddb54fb64693e51cd (docker/1.10-dev branch)
+ARG REGISTRY_COMMIT_SCHEMA1=ec87e9b6971d831f0eff752ddb54fb64693e51cd
+
+# GO_SWAGGER_COMMIT specifies the version of the go-swagger binary to build and
+# install. Go-swagger is used in CI for validating swagger.yaml in hack/validate/swagger-gen
+#
+# Currently uses a fork from https://github.com/kolyshkin/go-swagger/tree/golang-1.13-fix,
+# TODO: move to under moby/ or fix upstream go-swagger to work for us.
+ARG GO_SWAGGER_COMMIT=5793aa66d4b4112c2602c716516e24710e4adbb5
+
+# TOMLV_COMMIT specifies the version of the tomlv binary to build and install
+# from the https://github.com/BurntSushi/toml repository. This binary is used
+# in CI in the hack/validate/toml script.
+#
+# When updating this version, consider updating the github.com/BurntSushi/toml
+# dependency in vendor.conf accordingly.
+#
+# v0.3.1
+ARG TOMLV_COMMIT=3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005
+
+# VNDR_COMMIT specifies the version of the vndr tool to build and install
+# from the https://github.com/LK4D4/vndr repository.
+#
+# The vndr tool is used to manage vendored go packages in the vendor directory,
+# and is pinned to a fixed version because different versions of this tool
+# can result in differences in the (go) files that are considered for vendoring.
+#
+# v0.1.0
+ARG VNDR_COMMIT=d385c05e4c23b602dd16b3d2a1a6c710919bf02f
+
+# CONTAINERD_COMMIT specifies the version of the containerd runtime binary
+# to install from the https://github.com/containerd/containerd repository.
+#
+# This version is used to build statically compiled containerd binaries, and
+# used for the integration tests. The distributed docker .deb and .rpm packages
+# depend on a separate (containerd.io) package, which may be a different version
+# as is specified here.
+#
+# Generally, the commit specified here should match a tagged release.
+
+# The containerd golang package is also pinned in vendor.conf. When updating
+# the binary version you may also need to update the vendor version to pick up
+# bug fixes or new APIs, however, usually the Go packages are built from a
+# commit from the master branch.
+#
+# v1.3.2
+ARG CONTAINERD_COMMIT=ff48f57fc83a8c44cf4ad5d672424a98ba37ded6
+
+# LIBNETWORK_COMMIT is used to build the docker-userland-proxy binary. When
+# updating the binary version, consider updating github.com/docker/libnetwork
+# in vendor.conf accordingly
+ARG LIBNETWORK_COMMIT=90afbb01e1d8acacb505a092744ea42b9f167377
+
+ARG GOLANGCI_LINT_COMMIT=v1.20.0
+ARG GOTESTSUM_COMMIT=v0.3.5
+
+# DOCKERCLI_CHANNEL and DOCKERCLI_VERSION specify the version of the CLI to
+# install for use in the integration-cli tests. The integration-cli testsuite
+# is frozen, and no new tests should be added. The version of the CLI is pinned
+# to the CLI version that was current at the time the integration-cli suite
+# was frozen.
+ARG DOCKERCLI_CHANNEL=stable
+ARG DOCKERCLI_VERSION=17.06.2-ce
+
+# RUNC_COMMIT specifies the version of runc to install from the
+# https://github.com/opencontainers/runc repository.
+#
+# The version of runc should match the version that is used by the containerd
+# version that is used. If you need to update runc, open a pull request in
+# the containerd project first, and update both after that is merged.
+#
+# When updating RUNC_COMMIT, also update runc in vendor.conf accordingly
+#
+# v1.0.0-rc9
+ARG RUNC_COMMIT=d736ef14f0288d6993a1845745d6756cfc9ddd5a
+
+# TINI_COMMIT specifies the version of tini (docker-init) to build, and install
+# from the https://github.com/krallin/tini.git repository. This binary is used
+# when starting containers with the `--init` option.
+#
+# v0.18.0
+ARG TINI_COMMIT=fec3683b971d9c3ef73f284f176672c44b448662
+
+# ROOTLESSKIT_COMMIT specifies the version of rootlesskit to install from the
+# https://github.com/rootless-containers/rootlesskit.git repository
+#
+# v0.7.1
+ARG ROOTLESSKIT_COMMIT=76c4e26750da3986fa0e741464fbf0fcd55bea71
+
+# VPNKIT_DIGEST specifies the digest of the VPNKit (djs55/vpnkit) image to
+# use from Docker Hub, which contains the vpnkit binary. It's included in the
+# Dockerfile for all architectures, but currently only contains an x86_64 binary.
+# VPNKit is used for networking when running the daemon in rootless mode.
 ARG VPNKIT_DIGEST=e508a17cfacc8fd39261d5b4e397df2b953690da577e2c987a47630cd0c42f8e
 ARG DOCKER_BUILDTAGS="apparmor seccomp selinux"
 
@@ -29,9 +147,9 @@ RUN --mount=type=cache,sharing=locked,id=moby-criu-aptlib,target=/var/lib/apt \
             python-protobuf
 
 # Install CRIU for checkpoint/restore support
-ENV CRIU_VERSION 3.12
+ARG CRIU_VERSION
 RUN mkdir -p /usr/src/criu \
-    && curl -sSL https://github.com/checkpoint-restore/criu/archive/v${CRIU_VERSION}.tar.gz | tar -C /usr/src/criu/ -xz --strip-components=1 \
+    && curl -sSL https://github.com/checkpoint-restore/criu/archive/${CRIU_VERSION}.tar.gz | tar -C /usr/src/criu/ -xz --strip-components=1 \
     && cd /usr/src/criu \
     && make \
     && make PREFIX=/build/ install-criu
@@ -44,8 +162,8 @@ WORKDIR /go/src/github.com/docker/distribution
 # push/pull with both schema1 and schema2 manifests.
 # The old version of the registry is not working on arm64, so installation is
 # skipped on that architecture.
-ENV REGISTRY_COMMIT_SCHEMA1 ec87e9b6971d831f0eff752ddb54fb64693e51cd
-ENV REGISTRY_COMMIT 47a064d4195a9b56133891bbb13620c3ac83a827
+ARG REGISTRY_COMMIT
+ARG REGISTRY_COMMIT_SCHEMA1
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=tmpfs,target=/go/src/ \
@@ -64,10 +182,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 FROM base AS swagger
 WORKDIR $GOPATH/src/github.com/go-swagger/go-swagger
-# Install go-swagger for validating swagger.yaml
-# This is https://github.com/kolyshkin/go-swagger/tree/golang-1.13-fix
-# TODO: move to under moby/ or fix upstream go-swagger to work for us.
-ENV GO_SWAGGER_COMMIT 5793aa66d4b4112c2602c716516e24710e4adbb5
+ARG GO_SWAGGER_COMMIT
+# TODO: this is currently using https://github.com/kolyshkin/go-swagger/tree/golang-1.13-fix
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     --mount=type=tmpfs,target=/go/src/ \

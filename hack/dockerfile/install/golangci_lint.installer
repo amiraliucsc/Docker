@@ -1,11 +1,14 @@
 #!/bin/sh
 
-: "${GOLANGCI_LINT_COMMIT=v1.20.0}"
+set -e
 
 install_golangci_lint() {
+	: "${GOLANGCI_LINT_COMMIT?}"
+	: "${PREFIX?}"
+
 	echo "Installing golangci-lint version ${GOLANGCI_LINT_COMMIT}"
 	go get -d github.com/golangci/golangci-lint/cmd/golangci-lint
-	cd "$GOPATH/src/github.com/golangci/golangci-lint/" || exit 1
+	cd "$GOPATH/src/github.com/golangci/golangci-lint/"
 	git checkout -q "${GOLANGCI_LINT_COMMIT}"
 
 	version="$(git describe --tags)"
