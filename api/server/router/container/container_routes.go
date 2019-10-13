@@ -494,7 +494,7 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 
 		// Older clients (API < 1.40) expects the default to be shareable, make them happy
 		if hostConfig.IpcMode.IsEmpty() {
-			hostConfig.IpcMode = container.IpcMode("shareable")
+			hostConfig.IpcMode = "shareable"
 		}
 	}
 	if hostConfig != nil && versions.LessThan(version, "1.41") {
