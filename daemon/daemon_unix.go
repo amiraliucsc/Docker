@@ -363,7 +363,7 @@ func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConf
 		// for cgroup v2: unshare cgroupns even for privileged containers
 		// https://github.com/containers/libpod/pull/4374#issuecomment-549776387
 		if hostConfig.Privileged && !cgroups.IsCgroup2UnifiedMode() {
-			hostConfig.CgroupnsMode = containertypes.CgroupnsMode("host")
+			hostConfig.CgroupnsMode = containertypes.CgroupnsModeHost
 		} else {
 			m := "host"
 			if cgroups.IsCgroup2UnifiedMode() {
