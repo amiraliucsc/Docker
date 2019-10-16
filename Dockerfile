@@ -317,6 +317,9 @@ VOLUME /var/lib/docker
 ENTRYPOINT ["hack/dind"]
 
 FROM runtime-dev AS binary-base
+
+# These build-args are used by hack/make/.go-autogen. We "bake" then into
+# environment variables, so that they are also available in `make shell`
 ARG DOCKER_GITCOMMIT=HEAD
 ENV DOCKER_GITCOMMIT=${DOCKER_GITCOMMIT}
 ARG VERSION
@@ -329,6 +332,8 @@ ARG DEFAULT_PRODUCT_LICENSE
 ENV DEFAULT_PRODUCT_LICENSE=${DEFAULT_PRODUCT_LICENSE}
 ARG DOCKER_BUILDTAGS
 ENV DOCKER_BUILDTAGS="${DOCKER_BUILDTAGS}"
+ARG TINI_COMMIT
+ENV TINI_COMMIT=${TINI_COMMIT}
 ENV PREFIX=/build
 # TODO: This is here because hack/make.sh binary copies these extras binaries
 # from $PATH into the bundles dir.
