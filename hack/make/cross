@@ -21,7 +21,7 @@ for platform in ${DOCKER_CROSSPLATFORMS}; do
 		export GOOS=${platform%%/*}
 		export GOARCH=${platform#*/}
 
-		if [[ "${GOARCH}" = "arm/"* ]]; then
+		if [[ ${GOARCH} == "arm/"* ]]; then
 			GOARM=${GOARCH##*/v}
 			GOARCH=${GOARCH%/v*}
 			export GOARM

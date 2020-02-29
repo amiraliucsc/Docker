@@ -38,11 +38,11 @@ if [ "$(go env GOOS)" = "windows" ]; then
 
 	# Pass version and commit information into the resource compiler
 	defs=
-	[ ! -z $VERSION ]      && defs="$defs -D DOCKER_VERSION=\"$VERSION\""
+	[ ! -z $VERSION ] && defs="$defs -D DOCKER_VERSION=\"$VERSION\""
 	[ ! -z $VERSION_QUAD ] && defs="$defs -D DOCKER_VERSION_QUAD=$VERSION_QUAD"
-	[ ! -z $GITCOMMIT ]    && defs="$defs -D DOCKER_COMMIT=\"$GITCOMMIT\""
+	[ ! -z $GITCOMMIT ] && defs="$defs -D DOCKER_COMMIT=\"$GITCOMMIT\""
 
-	function makeres {
+	function makeres() {
 		${WINDRES} \
 			-i hack/make/.resources-windows/$1 \
 			-o $3 \
