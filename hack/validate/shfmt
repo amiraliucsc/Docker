@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e -o pipefail
+
+# NOTE: `git grep '^#!'` may also pick up non-shell script files.
+# Add `| grep -v exceptional_file.foo` if any false-positive is detected.
+git grep --name-only '^#!' | grep -v vendor | grep -v '\.go$' | grep -v Jenkinsfile |
+	xargs shfmt -d
