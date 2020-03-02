@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-if ! command -v qemu-nbd &>/dev/null; then
+if ! command -v qemu-nbd &> /dev/null; then
 	echo >&2 'error: "qemu-nbd" not found!'
 	exit 1
 fi
@@ -37,7 +37,7 @@ builddir=$(mktemp -d)
 cleanup() {
 	umount "$builddir/disk_image" || true
 	umount "$builddir/workdir" || true
-	qemu-nbd -d $block_device &>/dev/null || true
+	qemu-nbd -d $block_device &> /dev/null || true
 	rm -rf $builddir
 }
 trap cleanup EXIT
@@ -74,19 +74,19 @@ mount -t aufs -o "br=$builddir/diff=rw${base_image_mounts},dio,xino=/dev/shm/auf
 
 # Update files
 cd $builddir
-LC_ALL=C diff -rq disk_image workdir |
-	sed -re "s|Only in workdir(.*?): |DEL \1/|g;s|Only in disk_image(.*?): |ADD \1/|g;s|Files disk_image/(.+) and workdir/(.+) differ|UPDATE /\1|g" |
-	while read action entry; do
+LC_ALL=C diff -rq disk_image workdir \
+	| sed -re "s|Only in workdir(.*?): |DEL \1/|g;s|Only in disk_image(.*?): |ADD \1/|g;s|Files disk_image/(.+) and workdir/(.+) differ|UPDATE /\1|g" \
+	| while read action entry; do
 		case "$action" in
-		ADD | UPDATE)
-			cp -a "disk_image$entry" "workdir$entry"
-			;;
-		DEL)
-			rm -rf "workdir$entry"
-			;;
-		*)
-			echo "Error: unknown diff line: $action $entry" >&2
-			;;
+			ADD | UPDATE)
+				cp -a "disk_image$entry" "workdir$entry"
+				;;
+			DEL)
+				rm -rf "workdir$entry"
+				;;
+			*)
+				echo "Error: unknown diff line: $action $entry" >&2
+				;;
 		esac
 	done
 
@@ -95,8 +95,8 @@ new_image_id="$(for i in $(seq 1 32); do printf "%02x" $((RANDOM % 256)); done)"
 mkdir -p $builddir/result/$new_image_id
 cd diff
 tar -cf $builddir/result/$new_image_id/layer.tar *
-echo "1.0" >$builddir/result/$new_image_id/VERSION
-cat >$builddir/result/$new_image_id/json <<-EOS
+echo "1.0" > $builddir/result/$new_image_id/VERSION
+cat > $builddir/result/$new_image_id/json <<- EOS
 	{ "docker_version": "1.4.1"
 	, "id": "$new_image_id"
 	, "created": "$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
@@ -104,12 +104,12 @@ EOS
 
 if [ -n "$docker_base_image" ]; then
  image_id=$(docker inspect -f "{{.Id}}" "$docker_base_image")
- echo ", \"parent\": \"$image_id\"" >>$builddir/result/$new_image_id/json
+ echo ", \"parent\": \"$image_id\"" >> $builddir/result/$new_image_id/json
 fi
 
-echo "}" >>$builddir/result/$new_image_id/json
+echo "}" >> $builddir/result/$new_image_id/json
 
-echo "{\"$image_name\":{\"$image_tag\":\"$new_image_id\"}}" >$builddir/result/repositories
+echo "{\"$image_name\":{\"$image_tag\":\"$new_image_id\"}}" > $builddir/result/repositories
 
 cd $builddir/result
 

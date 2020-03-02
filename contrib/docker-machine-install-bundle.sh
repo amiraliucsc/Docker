@@ -47,7 +47,7 @@ control_docker() {
 	# NOTE: `docker-machine ssh $m sh -c "foo bar"` does not work
 	#       (but `docker-machine ssh $m sh -c "foo\ bar"` works)
 	#       Anyway we avoid using `sh -c` here for avoiding confusion
-	cat <<EOF | docker-machine ssh $m sudo sh
+	cat << EOF | docker-machine ssh $m sudo sh
 if command -v systemctl > /dev/null; then
   systemctl $op docker
 elif command -v service > /dev/null; then
@@ -86,33 +86,33 @@ install_to() {
 }
 
 check_prereq() {
-	command -v docker-machine >/dev/null || errexit "docker-machine not installed"
-	(tar --version | grep GNU >/dev/null) || errexit "GNU tar not installed"
+	command -v docker-machine > /dev/null || errexit "docker-machine not installed"
+	(tar --version | grep GNU > /dev/null) || errexit "GNU tar not installed"
 }
 
 case "$1" in
-"install")
-	shift
-	machines=$@
-	check_prereq
-	files=$(bundle_files)
-	echo "Files to be installed:"
-	for f in $files; do echo $f; done
-	pids=()
-	for m in $machines; do
-		install_to $m $files &
-		pids+=($!)
-	done
-	status=0
-	for pid in ${pids[@]}; do
-		wait $pid || {
-			status=$?
-			echo "background process $pid failed with exit status $status"
-		}
-	done
-	exit $status
-	;;
-*)
-	errexit "Usage: $0 install MACHINES"
-	;;
+	"install")
+		shift
+		machines=$@
+		check_prereq
+		files=$(bundle_files)
+		echo "Files to be installed:"
+		for f in $files; do echo $f; done
+		pids=()
+		for m in $machines; do
+			install_to $m $files &
+			pids+=($!)
+		done
+		status=0
+		for pid in ${pids[@]}; do
+			wait $pid || {
+				status=$?
+				echo "background process $pid failed with exit status $status"
+			}
+		done
+		exit $status
+		;;
+	*)
+		errexit "Usage: $0 install MACHINES"
+		;;
 esac

@@ -9,7 +9,7 @@
 set -e
 
 usage() {
-	cat <<EOOPTS
+	cat << EOOPTS
 $(basename $0) [OPTIONS] <name>
 OPTIONS:
   -p "<packages>"  The list of packages to install in the container.
@@ -26,7 +26,7 @@ EOOPTS
 
 # option defaults
 yum_config=/etc/yum.conf
-if [ -f /etc/dnf/dnf.conf ] && command -v dnf &>/dev/null; then
+if [ -f /etc/dnf/dnf.conf ] && command -v dnf &> /dev/null; then
 	yum_config=/etc/dnf/dnf.conf
 	alias yum=dnf
 fi
@@ -36,25 +36,25 @@ install_packages=()
 version=
 while getopts ":y:p:g:t:h" opt; do
 	case $opt in
-	y)
-		yum_config=$OPTARG
-		;;
-	h)
-		usage
-		;;
-	p)
-		install_packages+=("$OPTARG")
-		;;
-	g)
-		install_groups+=("$OPTARG")
-		;;
-	t)
-		version="$OPTARG"
-		;;
-	\?)
-		echo "Invalid option: -$OPTARG"
-		usage
-		;;
+		y)
+			yum_config=$OPTARG
+			;;
+		h)
+			usage
+			;;
+		p)
+			install_packages+=("$OPTARG")
+			;;
+		g)
+			install_groups+=("$OPTARG")
+			;;
+		t)
+			version="$OPTARG"
+			;;
+		\?)
+			echo "Invalid option: -$OPTARG"
+			usage
+			;;
 	esac
 done
 shift $((OPTIND - 1))
@@ -103,7 +103,7 @@ fi
 
 yum -c "$yum_config" --installroot="$target" -y clean all
 
-cat >"$target"/etc/sysconfig/network <<EOF
+cat > "$target"/etc/sysconfig/network << EOF
 NETWORKING=yes
 HOSTNAME=localhost.localdomain
 EOF

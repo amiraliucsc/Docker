@@ -42,10 +42,10 @@ DEFAULT_BUNDLES=(
 )
 
 VERSION=${VERSION:-dev}
-! BUILDTIME=$(date -u -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" --rfc-3339 ns 2>/dev/null | sed -e 's/ /T/')
+! BUILDTIME=$(date -u -d "@${SOURCE_DATE_EPOCH:-$(date +%s)}" --rfc-3339 ns 2> /dev/null | sed -e 's/ /T/')
 if [ "$DOCKER_GITCOMMIT" ]; then
 	GITCOMMIT="$DOCKER_GITCOMMIT"
-elif command -v git &>/dev/null && [ -e .git ] && git rev-parse &>/dev/null; then
+elif command -v git &> /dev/null && [ -e .git ] && git rev-parse &> /dev/null; then
 	GITCOMMIT=$(git rev-parse --short HEAD)
 	if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
 		GITCOMMIT="$GITCOMMIT-unsupported"
@@ -85,9 +85,9 @@ add_buildtag() {
 	[[ " $DOCKER_BUILDTAGS" == *" $1_"* ]] || DOCKER_BUILDTAGS+=" $1_$2"
 }
 
-if ${PKG_CONFIG} 'libsystemd >= 209' 2>/dev/null; then
+if ${PKG_CONFIG} 'libsystemd >= 209' 2> /dev/null; then
 	DOCKER_BUILDTAGS+=" journald"
-elif ${PKG_CONFIG} 'libsystemd-journal' 2>/dev/null; then
+elif ${PKG_CONFIG} 'libsystemd-journal' 2> /dev/null; then
 	DOCKER_BUILDTAGS+=" journald journald_compat"
 fi
 
@@ -96,8 +96,8 @@ fi
 # libdm_no_deferred_remove in dynamic cases because the binary could be shipped
 # with a newer libdevmapper than the one it was built with.
 if
-	command -v gcc &>/dev/null &&
-		! (echo -e '#include <libdevmapper.h>\nint main() { dm_task_deferred_remove(NULL); }' | gcc -xc - -o /dev/null $(pkg-config --libs devmapper) &>/dev/null) \
+	command -v gcc &> /dev/null \
+		&& ! (echo -e '#include <libdevmapper.h>\nint main() { dm_task_deferred_remove(NULL); }' | gcc -xc - -o /dev/null $(pkg-config --libs devmapper) &> /dev/null) \
 		;
 then
 	add_buildtag libdm dlsym_deferred_remove

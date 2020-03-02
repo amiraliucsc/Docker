@@ -19,15 +19,15 @@ function urlencode() {
 	for ((i = 0; i < length; i++)); do
 		local c="${1:i:1}"
 		case $c in
-		[a-zA-Z0-9.~_-]) printf "$c" ;;
-		*) printf '%%%02X' "'$c" ;;
+			[a-zA-Z0-9.~_-]) printf "$c" ;;
+			*) printf '%%%02X' "'$c" ;;
 		esac
 	done
 }
 
 function template() {
 	# this should always match the template from CONTRIBUTING.md
-	cat <<-EOM
+	cat <<- EOM
 		Description of problem:
 
 
@@ -90,7 +90,7 @@ echo ""
 
 issue_url=$(format_issue_url "${issue_title}" "$(template)")
 
-if which xdg-open 2>/dev/null >/dev/null; then
+if which xdg-open 2> /dev/null > /dev/null; then
 	echo -ne "Would like to launch this report in your browser? [Y|n]: "
 	read -r -n 1 launch_now
 	echo ""

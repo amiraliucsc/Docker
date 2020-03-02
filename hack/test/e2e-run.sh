@@ -13,8 +13,8 @@ export DOCKER_ENGINE_GOARCH=${DOCKER_ENGINE_GOARCH:-${ARCH}}
 : ${TESTDEBUG:=}
 
 integration_api_dirs=${TEST_INTEGRATION_DIR:-"$(
-	find /tests/integration -type d |
-		grep -vE '(^/tests/integration($|/internal)|/testdata)'
+	find /tests/integration -type d \
+		| grep -vE '(^/tests/integration($|/internal)|/testdata)'
 )"}
 
 run_test_integration() {

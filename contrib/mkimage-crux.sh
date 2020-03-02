@@ -37,7 +37,7 @@ for pkg in $CRUX/crux/core/*; do
 done
 
 # Remove agetty and inittab config
-if (grep agetty ${ROOTFS}/etc/inittab 2>&1 >/dev/null); then
+if (grep agetty ${ROOTFS}/etc/inittab 2>&1 > /dev/null); then
 	echo "Removing agetty from /etc/inittab ..."
 	chroot ${ROOTFS} sed -i -e "/agetty/d" /etc/inittab
 	chroot ${ROOTFS} sed -i -e "/shutdown/d" /etc/inittab

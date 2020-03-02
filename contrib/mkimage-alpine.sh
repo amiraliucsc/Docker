@@ -19,13 +19,13 @@ tmp() {
 }
 
 apkv() {
-	curl -sSL $MAINREPO/$ARCH/APKINDEX.tar.gz | tar -Oxz |
-		grep --text '^P:apk-tools-static$' -A1 | tail -n1 | cut -d: -f2
+	curl -sSL $MAINREPO/$ARCH/APKINDEX.tar.gz | tar -Oxz \
+		| grep --text '^P:apk-tools-static$' -A1 | tail -n1 | cut -d: -f2
 }
 
 getapk() {
-	curl -sSL $MAINREPO/$ARCH/apk-tools-static-$(apkv).apk |
-		tar -xz -C $TMP sbin/apk.static
+	curl -sSL $MAINREPO/$ARCH/apk-tools-static-$(apkv).apk \
+		| tar -xz -C $TMP sbin/apk.static
 }
 
 mkbase() {
@@ -34,8 +34,8 @@ mkbase() {
 }
 
 conf() {
-	printf '%s\n' $MAINREPO >$ROOTFS/etc/apk/repositories
-	printf '%s\n' $ADDITIONALREPO >>$ROOTFS/etc/apk/repositories
+	printf '%s\n' $MAINREPO > $ROOTFS/etc/apk/repositories
+	printf '%s\n' $ADDITIONALREPO >> $ROOTFS/etc/apk/repositories
 }
 
 pack() {
@@ -49,29 +49,29 @@ pack() {
 save() {
 	[ $SAVE -eq 1 ] || return 0
 
-	tar --numeric-owner -C $ROOTFS -c . | xz >rootfs.tar.xz
+	tar --numeric-owner -C $ROOTFS -c . | xz > rootfs.tar.xz
 }
 
 while getopts "hr:m:sc:a:" opt; do
 	case $opt in
-	r)
-		REL=$OPTARG
-		;;
-	m)
-		MIRROR=$OPTARG
-		;;
-	s)
-		SAVE=1
-		;;
-	c)
-		ADDITIONALREPO=$OPTARG
-		;;
-	a)
-		ARCH=$OPTARG
-		;;
-	*)
-		usage
-		;;
+		r)
+			REL=$OPTARG
+			;;
+		m)
+			MIRROR=$OPTARG
+			;;
+		s)
+			SAVE=1
+			;;
+		c)
+			ADDITIONALREPO=$OPTARG
+			;;
+		a)
+			ARCH=$OPTARG
+			;;
+		*)
+			usage
+			;;
 	esac
 done
 

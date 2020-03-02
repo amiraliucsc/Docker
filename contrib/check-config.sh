@@ -19,7 +19,7 @@ else
 	: "${CONFIG:="${possibleConfigs[0]}"}"
 fi
 
-if ! command -v zgrep &>/dev/null; then
+if ! command -v zgrep &> /dev/null; then
 	zgrep() {
 		zcat "$2" | grep "$1"
 	}
@@ -31,13 +31,13 @@ kernelMinor="${kernelVersion#$kernelMajor.}"
 kernelMinor="${kernelMinor%%.*}"
 
 is_set() {
-	zgrep "CONFIG_$1=[y|m]" "$CONFIG" >/dev/null
+	zgrep "CONFIG_$1=[y|m]" "$CONFIG" > /dev/null
 }
 is_set_in_kernel() {
-	zgrep "CONFIG_$1=y" "$CONFIG" >/dev/null
+	zgrep "CONFIG_$1=y" "$CONFIG" > /dev/null
 }
 is_set_as_module() {
-	zgrep "CONFIG_$1=m" "$CONFIG" >/dev/null
+	zgrep "CONFIG_$1=m" "$CONFIG" > /dev/null
 }
 
 color() {
@@ -49,15 +49,15 @@ color() {
 	if [ "$#" -gt 0 ]; then
 		local code=
 		case "$1" in
-		# see https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-		black) code=30 ;;
-		red) code=31 ;;
-		green) code=32 ;;
-		yellow) code=33 ;;
-		blue) code=34 ;;
-		magenta) code=35 ;;
-		cyan) code=36 ;;
-		white) code=37 ;;
+			# see https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+			black) code=30 ;;
+			red) code=31 ;;
+			green) code=32 ;;
+			yellow) code=33 ;;
+			blue) code=34 ;;
+			magenta) code=35 ;;
+			cyan) code=36 ;;
+			white) code=37 ;;
 		esac
 		if [ "$code" ]; then
 			codes=("${codes[@]}" "$code")
@@ -104,7 +104,7 @@ check_flags() {
 }
 
 check_command() {
-	if command -v "$1" >/dev/null 2>&1; then
+	if command -v "$1" > /dev/null 2>&1; then
 		wrap_good "$1 command" 'available'
 	else
 		wrap_bad "$1 command" 'missing'
@@ -122,7 +122,7 @@ check_device() {
 }
 
 check_distro_userns() {
-	source /etc/os-release 2>/dev/null || /bin/true
+	source /etc/os-release 2> /dev/null || /bin/true
 	if [[ ${ID} =~ ^(centos|rhel)$ && ${VERSION_ID} =~ ^7 ]]; then
 		# this is a CentOS7 or RHEL7 system
 		grep -q "user_namespace.enable=1" /proc/cmdline || {
@@ -169,16 +169,16 @@ else
 	echo "    $(wrap_color '(see https://github.com/tianon/cgroupfs-mount)' yellow)"
 fi
 
-if [ "$(cat /sys/module/apparmor/parameters/enabled 2>/dev/null)" = 'Y' ]; then
+if [ "$(cat /sys/module/apparmor/parameters/enabled 2> /dev/null)" = 'Y' ]; then
 	echo -n '- '
-	if command -v apparmor_parser &>/dev/null; then
+	if command -v apparmor_parser &> /dev/null; then
 		wrap_good 'apparmor' 'enabled and tools installed'
 	else
 		wrap_bad 'apparmor' 'enabled, but apparmor_parser missing'
 		echo -n '    '
-		if command -v apt-get &>/dev/null; then
+		if command -v apt-get &> /dev/null; then
 			wrap_color '(use "apt-get install apparmor" to fix this)'
-		elif command -v yum &>/dev/null; then
+		elif command -v yum &> /dev/null; then
 			wrap_color '(your best bet is "yum install apparmor-parser")'
 		else
 			wrap_color '(look for an "apparmor" package for your distribution)'

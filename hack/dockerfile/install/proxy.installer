@@ -7,17 +7,17 @@
 
 install_proxy() {
 	case "$1" in
-	"dynamic")
-		install_proxy_dynamic
-		return
-		;;
-	"")
-		export CGO_ENABLED=0
-		_install_proxy
-		;;
-	*)
-		echo 'Usage: $0 [dynamic]'
-		;;
+		"dynamic")
+			install_proxy_dynamic
+			return
+			;;
+		"")
+			export CGO_ENABLED=0
+			_install_proxy
+			;;
+		*)
+			echo 'Usage: $0 [dynamic]'
+			;;
 	esac
 }
 

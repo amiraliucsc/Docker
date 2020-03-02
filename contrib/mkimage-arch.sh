@@ -7,12 +7,12 @@ set -e
 # reset umask to default
 umask 022
 
-hash pacstrap &>/dev/null || {
+hash pacstrap &> /dev/null || {
 	echo "Could not find pacstrap. Run pacman -S arch-install-scripts"
 	exit 1
 }
 
-hash expect &>/dev/null || {
+hash expect &> /dev/null || {
 	echo "Could not find expect. Run pacman -S expect"
 	exit 1
 }
@@ -78,36 +78,36 @@ PKGREMOVE="${PKGREMOVE[*]}"
 
 arch="$(uname -m)"
 case "$arch" in
-armv*)
-	if pacman -Q archlinuxarm-keyring >/dev/null 2>&1; then
-		pacman-key --init
-		pacman-key --populate archlinuxarm
-	else
-		echo "Could not find archlinuxarm-keyring. Please, install it and run pacman-key --populate archlinuxarm"
-		exit 1
-	fi
-	PACMAN_CONF=$(mktemp ${TMPDIR:-/var/tmp}/pacman-conf-archlinux-XXXXXXXXX)
-	version="$(echo $arch | cut -c 5)"
-	sed "s/Architecture = armv/Architecture = armv${version}h/g" './mkimage-archarm-pacman.conf' >"${PACMAN_CONF}"
-	PACMAN_MIRRORLIST='Server = http://mirror.archlinuxarm.org/$arch/$repo'
-	PACMAN_EXTRA_PKGS='archlinuxarm-keyring'
-	EXPECT_TIMEOUT=1800 # Most armv* based devices can be very slow (e.g. RPiv1)
-	ARCH_KEYRING=archlinuxarm
-	DOCKER_IMAGE_NAME="armv${version}h/archlinux"
-	;;
-*)
-	PACMAN_CONF='./mkimage-arch-pacman.conf'
-	PACMAN_MIRRORLIST='Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch'
-	PACMAN_EXTRA_PKGS=''
-	EXPECT_TIMEOUT=60
-	ARCH_KEYRING=archlinux
-	DOCKER_IMAGE_NAME=archlinux
-	;;
+	armv*)
+		if pacman -Q archlinuxarm-keyring > /dev/null 2>&1; then
+			pacman-key --init
+			pacman-key --populate archlinuxarm
+		else
+			echo "Could not find archlinuxarm-keyring. Please, install it and run pacman-key --populate archlinuxarm"
+			exit 1
+		fi
+		PACMAN_CONF=$(mktemp ${TMPDIR:-/var/tmp}/pacman-conf-archlinux-XXXXXXXXX)
+		version="$(echo $arch | cut -c 5)"
+		sed "s/Architecture = armv/Architecture = armv${version}h/g" './mkimage-archarm-pacman.conf' > "${PACMAN_CONF}"
+		PACMAN_MIRRORLIST='Server = http://mirror.archlinuxarm.org/$arch/$repo'
+		PACMAN_EXTRA_PKGS='archlinuxarm-keyring'
+		EXPECT_TIMEOUT=1800 # Most armv* based devices can be very slow (e.g. RPiv1)
+		ARCH_KEYRING=archlinuxarm
+		DOCKER_IMAGE_NAME="armv${version}h/archlinux"
+		;;
+	*)
+		PACMAN_CONF='./mkimage-arch-pacman.conf'
+		PACMAN_MIRRORLIST='Server = https://mirrors.kernel.org/archlinux/$repo/os/$arch'
+		PACMAN_EXTRA_PKGS=''
+		EXPECT_TIMEOUT=60
+		ARCH_KEYRING=archlinux
+		DOCKER_IMAGE_NAME=archlinux
+		;;
 esac
 
 export PACMAN_MIRRORLIST
 
-expect <<EOF
+expect << EOF
 	set send_slow {1 .1}
 	proc send {ignore arg} {
 		sleep .1
@@ -128,7 +128,7 @@ arch-chroot $ROOTFS /bin/sh -c 'rm -r /usr/share/man/*'
 arch-chroot $ROOTFS /bin/sh -c "haveged -w 1024; pacman-key --init; pkill haveged; pacman-key --populate $ARCH_KEYRING"
 arch-chroot $ROOTFS /bin/sh -c "ln -sf /usr/share/zoneinfo/UTC /etc/localtime"
 arch-chroot $ROOTFS /bin/sh -c "for pkg in $PKGREMOVE; do if pacman -Qi \$pkg > /dev/null 2>&1; then pacman -Rs --noconfirm \$pkg; fi; done"
-echo 'en_US.UTF-8 UTF-8' >$ROOTFS/etc/locale.gen
+echo 'en_US.UTF-8 UTF-8' > $ROOTFS/etc/locale.gen
 arch-chroot $ROOTFS locale-gen
 
 # udev doesn't work in containers, rebuild /dev

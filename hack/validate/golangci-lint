@@ -11,9 +11,9 @@ SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -n "${TESTDEBUG}" ] && set -x
 
 # TODO find a way to share this code with hack/make.sh
-if ${PKG_CONFIG} 'libsystemd >= 209' 2>/dev/null; then
+if ${PKG_CONFIG} 'libsystemd >= 209' 2> /dev/null; then
 	DOCKER_BUILDTAGS+=" journald"
-elif ${PKG_CONFIG} 'libsystemd-journal' 2>/dev/null; then
+elif ${PKG_CONFIG} 'libsystemd-journal' 2> /dev/null; then
 	DOCKER_BUILDTAGS+=" journald journald_compat"
 fi
 

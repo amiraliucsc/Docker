@@ -3,5 +3,5 @@ set -e -o pipefail
 
 # NOTE: `git grep '^#!'` may also pick up non-shell script files.
 # Add `| grep -v exceptional_file.foo` if any false-positive is detected.
-git grep --name-only '^#!' | grep -v vendor | grep -v '\.go$' | grep -v Jenkinsfile |
-	xargs shfmt -d
+git grep --name-only '^#!' | grep -v vendor | grep -v '\.go$' | grep -v Jenkinsfile \
+	| xargs xargs shfmt -d -bn -ci -sr -w
