@@ -72,41 +72,41 @@ func (i Isolation) IsProcess() bool {
 	return Isolation(strings.ToLower(string(i))) == IsolationProcess
 }
 
-// IpcMode constants
-const (
-	ipcModeNone      = "none"
-	ipcModeHost      = "host"
-	ipcModeContainer = "container"
-	ipcModePrivate   = "private"
-	ipcModeShareable = "shareable"
-)
-
 // IpcMode represents the container ipc stack.
 type IpcMode string
 
+// IpcMode constants
+const (
+	IPCModeNone      IpcMode = "none"
+	IPCModeHost      IpcMode = "host"
+	IPCModeContainer IpcMode = "container"
+	IPCModePrivate   IpcMode = "private"
+	IPCModeShareable IpcMode = "shareable"
+)
+
 // IsPrivate indicates whether the container uses its own private ipc namespace which can not be shared.
 func (n IpcMode) IsPrivate() bool {
-	return n == ipcModePrivate
+	return n == IPCModePrivate
 }
 
 // IsHost indicates whether the container shares the host's ipc namespace.
 func (n IpcMode) IsHost() bool {
-	return n == ipcModeHost
+	return n == IPCModeHost
 }
 
 // IsShareable indicates whether the container's ipc namespace can be shared with another container.
 func (n IpcMode) IsShareable() bool {
-	return n == ipcModeShareable
+	return n == IPCModeShareable
 }
 
 // IsContainer indicates whether the container uses another container's ipc namespace.
 func (n IpcMode) IsContainer() bool {
-	return strings.HasPrefix(string(n), ipcModeContainer+":")
+	return strings.HasPrefix(string(n), string(IPCModeContainer)+":")
 }
 
 // IsNone indicates whether container IpcMode is set to "none".
 func (n IpcMode) IsNone() bool {
-	return n == ipcModeNone
+	return n == IPCModeNone
 }
 
 // IsEmpty indicates whether container IpcMode is empty
@@ -122,7 +122,7 @@ func (n IpcMode) Valid() bool {
 // Container returns the name of the container ipc stack is going to be used.
 func (n IpcMode) Container() string {
 	if n.IsContainer() {
-		return strings.TrimPrefix(string(n), ipcModeContainer+":")
+		return strings.TrimPrefix(string(n), string(IPCModeContainer)+":")
 	}
 	return ""
 }
